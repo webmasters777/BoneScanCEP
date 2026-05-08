@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BoneScanCEP | UI Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body class="stApp">
+  <main class="page">
+    <section class="hero">
+      <div class="pill">AI Medical Imaging</div>
+      <h1>AI-Based Multi-Task Analysis of Bone Scan</h1>
+      <p>Upload a bone scan image or provide a local path to generate multi-step preprocessing, feature extraction, and visual analytics in one view.</p>
+    </section>
+
+    <section class="card input-card" aria-label="Input source">
+      <div class="section-title">Input source</div>
+      <div class="radio-row">
+        <label class="radio">
+          <input type="radio" name="input-mode" value="upload" checked>
+          <span>Upload image</span>
+        </label>
+        <label class="radio">
+          <input type="radio" name="input-mode" value="local">
+          <span>Local path</span>
+        </label>
+      </div>
+
+      <div class="input-block">
+        <label>Dataset</label>
+        <select id="dataset-select">
+          <option value="chestRANT" selected>chestRANT</option>
+          <option value="chestRPOST">chestRPOST</option>
+          <option value="custom">Custom upload</option>
+        </select>
+      </div>
+
+      <div class="input-block" data-mode="upload">
+        <label>Upload Bone Scan Image</label>
+        <div class="fake-upload">
+          <label class="btn file-label" for="file-input">Browse files</label>
+          <span class="muted" id="file-name">No file chosen</span>
+        </div>
+        <input id="file-input" class="file-input" type="file" accept="image/*">
+      </div>
+
+      <div class="input-block" data-mode="local" hidden>
+        <label>Image path (local)</label>
+        <input type="text" placeholder="C:\path\to\image.jpg" value="">
+      </div>
+    </section>
+
+    <section class="results">
+      <div class="columns">
+        <div class="left">
+          <div class="card image-card">
+            <div class="image-header">Analysis output</div>
+            <button class="thumb" data-full="outputs/previews/chestRANT_1.png" data-title="chestRANT_1.png">
+              <img src="outputs/previews/chestRANT_1.png" alt="chestRANT_1.png">
+            </button>
+          </div>
+        </div>
+        <div class="right">
+          <div class="card">
+            <h3>Key Metrics</h3>
+            <div class="metric-grid">
+              <div class="metric"><div class="label">Contrast</div><div class="value" data-metric="contrast">--</div></div>
+              <div class="metric"><div class="label">Energy</div><div class="value" data-metric="energy">--</div></div>
+              <div class="metric"><div class="label">Homogeneity</div><div class="value" data-metric="homogeneity">--</div></div>
+              <div class="metric"><div class="label">Mean</div><div class="value" data-metric="mean">--</div></div>
+              <div class="metric"><div class="label">Std</div><div class="value" data-metric="std">--</div></div>
+              <div class="metric"><div class="label">Median</div><div class="value" data-metric="median">--</div></div>
+              <div class="metric"><div class="label">Otsu Thr</div><div class="value" data-metric="otsu">--</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card save-card" aria-label="Save analysis">
+      <label class="checkbox">
+        <input type="checkbox" id="save-toggle">
+        <span>Save analysis image</span>
+      </label>
+      <div class="input-block" id="save-path" hidden>
+        <label>Save path</label>
+        <input type="text" value="outputs\previews\chestRANT_1.png">
+      </div>
+    </section>
+  </main>
+
+  <dialog id="lightbox" class="lightbox" aria-label="Output preview">
+    <div class="dialog-card">
+      <div class="dialog-header">
+        <div class="dialog-title">Output preview</div>
+        <button id="dialog-close" class="btn ghost" type="button">Close</button>
+      </div>
+      <img src="" alt="Output preview">
+    </div>
+  </dialog>
+
+  <script>
+    const dialog = document.getElementById("lightbox");
+    const dialogImage = dialog.querySelector("img");
+    const dialogTitle = dialog.querySelector(".dialog-title");
+    const closeBtn = document.getElementById("dialog-close");
+    const modeInputs = document.querySelectorAll("input[name=\"input-mode\"]");
+    const modeBlocks = document.querySelectorAll("[data-mode]");
+    const saveToggle = document.getElementById("save-toggle");
+    const savePath = document.getElementById("save-path");
+    const savePathInput = savePath.querySelector("input");
+    const datasetSelect = document.getElementById("dataset-select");
+    const previewButton = document.querySelector(".thumb");
+    const previewImage = previewButton.querySelector("img");
+    const fileInput = document.getElementById("file-input");
+    const fileName = document.getElementById("file-name");
+    let activeObjectUrl = null;
+
+    const datasetConfig = {
+      chestRANT: {
+        image: "outputs/previews/chestRANT_1.png",
+        title: "chestRANT_1.png",
+        metrics: {
+          contrast: "104.0952",
+          energy: "0.1890",
+          homogeneity: "0.4145",
+          mean: "42.77",
+          std: "36.95",
+          median: "39.00",
+          otsu: "58",
+        },
+      },
+      chestRPOST: {
+        image: "outputs/previews/chestRPOST_1.png",
+        title: "chestRPOST_1.png",
+        metrics: {
+          contrast: "201.0098",
+          energy: "0.1974",
+          homogeneity: "0.3552",
+          mean: "62.20",
+          std: "49.21",
+          median: "57.00",
+          otsu: "65",
+        },
+      },
+    };
+
+    const updateInputMode = () => {
+      const active = document.querySelector("input[name=\"input-mode\"]:checked").value;
+      modeBlocks.forEach((block) => {
+        block.hidden = block.dataset.mode !== active;
+      });
+    };
+
+    const setMetrics = (metrics) => {
+      document.querySelectorAll("[data-metric]").forEach((node) => {
+        const key = node.dataset.metric;
+        node.textContent = metrics && metrics[key] ? metrics[key] : "--";
+      });
+    };
+
+    const setPreview = (src, title, savePathValue) => {
+      previewButton.dataset.full = src;
+      previewButton.dataset.title = title;
+      previewImage.src = src;
+      previewImage.alt = title;
+      savePathInput.value = savePathValue;
+    };
+
+    const resetUploadUI = () => {
+      if (fileInput) {
+        fileInput.value = "";
+      }
+      if (fileName) {
+        fileName.textContent = "No file chosen";
+      }
+    };
+
+    const clearObjectUrl = () => {
+      if (activeObjectUrl) {
+        URL.revokeObjectURL(activeObjectUrl);
+        activeObjectUrl = null;
+      }
+    };
+
+    const applyDataset = (name) => {
+      const config = datasetConfig[name];
+      if (!config) {
+        return;
+      }
+      clearObjectUrl();
+      resetUploadUI();
+      setPreview(config.image, config.title, config.image.replace(/\//g, "\\"));
+      setMetrics(config.metrics);
+    };
+
+    modeInputs.forEach((input) => input.addEventListener("change", updateInputMode));
+    updateInputMode();
+
+    datasetSelect.addEventListener("change", (event) => {
+      if (datasetConfig[event.target.value]) {
+        applyDataset(event.target.value);
+      } else {
+        setMetrics(null);
+      }
+    });
+    applyDataset(datasetSelect.value);
+
+    fileInput.addEventListener("change", (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) {
+        if (datasetConfig[datasetSelect.value]) {
+          applyDataset(datasetSelect.value);
+        }
+        return;
+      }
+
+      clearObjectUrl();
+      activeObjectUrl = URL.createObjectURL(file);
+      setPreview(activeObjectUrl, file.name, file.name);
+      fileName.textContent = file.name;
+      datasetSelect.value = "custom";
+      setMetrics(null);
+    });
+
+    saveToggle.addEventListener("change", () => {
+      savePath.hidden = !saveToggle.checked;
+    });
+
+    document.querySelectorAll(".thumb").forEach((button) => {
+      button.addEventListener("click", () => {
+        const src = button.dataset.full;
+        const title = button.dataset.title;
+
+        dialogImage.src = src;
+        dialogImage.alt = title;
+        dialogTitle.textContent = title;
+
+        if (typeof dialog.showModal === "function") {
+          dialog.showModal();
+        } else {
+          window.open(src, "_blank");
+        }
+      });
+    });
+
+    closeBtn.addEventListener("click", () => dialog.close());
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) {
+        dialog.close();
+      }
+    });
+  </script>
+</body>
+</html>
