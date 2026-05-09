@@ -8,6 +8,9 @@ from skimage.feature import graycomatrix, graycoprops, local_binary_pattern
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 
+# Dataset path
+DATASET_PATH = os.path.join(os.path.dirname(__file__), "dataset project")
+
 
 def iter_image_files(folder_path):
     for root, _dirs, files in os.walk(folder_path):
@@ -24,42 +27,118 @@ def load_image_bgr(image_path):
     return img_bgr
 
 
-def build_analysis(img_bgr, fname="image"):
+def extract_metrics(img_bgr):
+    """
+    OPTIMIZED: Extract only metrics WITHOUT creating visualization.
+    This is fast and efficient for batch processing and metrics-only mode.
+    
+    Returns:
+        dict: Contains all computed metrics and processed images
+    """
     if img_bgr is None:
         raise ValueError("Input image is empty or unreadable.")
 
-    original = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+    # Color space conversions (minimal, only for processing)
     gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
 
+    # Filtering
     median = cv2.medianBlur(gray, 5)
     gaussian = cv2.GaussianBlur(gray, (5, 5), 0)
 
+    # Enhancement
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     enhanced = clahe.apply(gaussian)
     norm = cv2.normalize(enhanced, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
 
+    # Edge detection
     gx = cv2.Sobel(norm, cv2.CV_64F, 1, 0, ksize=3)
     gy = cv2.Sobel(norm, cv2.CV_64F, 0, 1, ksize=3)
     sobel = cv2.convertScaleAbs(np.sqrt(gx**2 + gy**2))
     canny = cv2.Canny(norm, 50, 150)
 
+    # Thresholding
     otsu_val, thresh = cv2.threshold(norm, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-
     _, hotspot_mask = cv2.threshold(norm, int(otsu_val * 1.1), 255, cv2.THRESH_BINARY)
-    hotspot_display = cv2.cvtColor(norm, cv2.COLOR_GRAY2RGB)
-    hotspot_display[hotspot_mask == 255] = [220, 0, 0]
 
+    # Texture features - GLCM
     glcm = graycomatrix(norm, [1], [0], 256, symmetric=True, normed=True)
     contrast = graycoprops(glcm, "contrast")[0, 0]
     energy = graycoprops(glcm, "energy")[0, 0]
     homogeneity = graycoprops(glcm, "homogeneity")[0, 0]
 
+    # Texture features - LBP
     lbp_map = local_binary_pattern(norm, P=24, R=3, method="uniform")
     lbp_hist, _ = np.histogram(lbp_map.ravel(), bins=26, range=(0, 26), density=True)
 
+    # Statistical metrics
     mean_val = float(norm.mean())
     std_val = float(norm.std())
     median_val = float(np.median(norm))
+
+    metrics = {
+        "contrast": float(contrast),
+        "energy": float(energy),
+        "homogeneity": float(homogeneity),
+        "mean": mean_val,
+        "std": std_val,
+        "median": median_val,
+        "otsu": float(otsu_val),
+    }
+
+    # Store processed images for visualization (if needed later)
+    processed_data = {
+        "original": cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB),
+        "gray": gray,
+        "median": median,
+        "gaussian": gaussian,
+        "enhanced": enhanced,
+        "norm": norm,
+        "sobel": sobel,
+        "canny": canny,
+        "thresh": thresh,
+        "hotspot_display": cv2.cvtColor(norm, cv2.COLOR_GRAY2RGB),
+        "hotspot_mask": hotspot_mask,
+        "lbp_hist": lbp_hist,
+        "metrics": metrics,
+    }
+
+    return processed_data
+
+
+def create_visualization(processed_data, fname="image"):
+    """
+    OPTIMIZED: Create visualization from pre-computed data.
+    This is called ONLY when visualization is needed.
+    
+    Args:
+        processed_data: dict from extract_metrics()
+        fname: filename for title
+        
+    Returns:
+        matplotlib.figure.Figure: The analysis figure
+    """
+    # Extract data
+    original = processed_data["original"]
+    gray = processed_data["gray"]
+    median = processed_data["median"]
+    gaussian = processed_data["gaussian"]
+    enhanced = processed_data["enhanced"]
+    norm = processed_data["norm"]
+    sobel = processed_data["sobel"]
+    canny = processed_data["canny"]
+    thresh = processed_data["thresh"]
+    hotspot_display = processed_data["hotspot_display"]
+    hotspot_mask = processed_data["hotspot_mask"]
+    lbp_hist = processed_data["lbp_hist"]
+    metrics = processed_data["metrics"]
+    
+    contrast = metrics["contrast"]
+    energy = metrics["energy"]
+    homogeneity = metrics["homogeneity"]
+    mean_val = metrics["mean"]
+    std_val = metrics["std"]
+    median_val = metrics["median"]
+    otsu_val = metrics["otsu"]
 
     fig = plt.figure(figsize=(18, 20))
     fig.suptitle(f"Analysis | {fname}", fontsize=14, fontweight="bold", y=0.98)
@@ -167,14 +246,262 @@ def build_analysis(img_bgr, fname="image"):
     ax_lbp.set_ylabel("Normalized Frequency", fontsize=9)
     ax_lbp.tick_params(labelsize=8)
 
-    metrics = {
-        "contrast": float(contrast),
-        "energy": float(energy),
-        "homogeneity": float(homogeneity),
-        "mean": mean_val,
-        "std": std_val,
-        "median": median_val,
-        "otsu": float(otsu_val),
+    return fig
+
+
+def build_analysis(img_bgr, fname="image"):
+    """
+    WRAPPER: Combines metrics extraction and visualization.
+    For backward compatibility with existing code (UI.py, DIPCEP.py).
+    
+    Args:
+        img_bgr: OpenCV image in BGR format
+        fname: filename for title
+        
+    Returns:
+        tuple: (matplotlib.figure.Figure, dict of metrics)
+    """
+    processed_data = extract_metrics(img_bgr)
+    fig = create_visualization(processed_data, fname)
+    metrics = processed_data["metrics"]
+    return fig, metrics
+
+
+# ============================================================================
+# DATASET LOADING & CLASSIFICATION (NEW FEATURES FOR FULL PROJECT)
+# ============================================================================
+
+def load_dataset_labels(view_type="RANT"):
+    """
+    Load dataset labels from file.
+    
+    Args:
+        view_type: "RANT" for anterior or "RPOST" for posterior
+        
+    Returns:
+        dict: {filename: label (0/1)} - 0=normal, 1=metastasis
+    """
+    if view_type == "RANT":
+        label_file = os.path.join(DATASET_PATH, "chestRANT", "chestRANT.txt")
+    else:
+        label_file = os.path.join(DATASET_PATH, "chestRPOST", "chestRPOST.txt")
+    
+    labels = {}
+    if os.path.exists(label_file):
+        with open(label_file, 'r') as f:
+            for line in f:
+                parts = line.strip().split('\t')
+                if len(parts) == 2:
+                    filename, label = parts
+                    labels[filename] = int(label)
+    return labels
+
+
+def classify_bone_metastasis(metrics):
+    """
+    Classify if image shows bone metastasis based on extracted features.
+    Uses machine learning-like approach with feature thresholds.
+    
+    Args:
+        metrics: dict with GLCM, LBP, and statistical features
+        
+    Returns:
+        dict: {
+            'classification': 'SUSPICIOUS'|'BORDERLINE'|'NORMAL',
+            'confidence': float (0-1),
+            'score': float (0-1),
+            'reasoning': str
+        }
+    """
+    contrast = metrics['contrast']
+    energy = metrics['energy']
+    homogeneity = metrics['homogeneity']
+    mean_val = metrics['mean']
+    std_val = metrics['std']
+    
+    # Feature-based scoring (0-1) - Improved for better detection
+    score = 0.0
+    reasoning = []
+    
+    # High contrast indicates texture variation (suspicious)
+    if contrast > 0.12:
+        score += 0.25
+        reasoning.append("Elevated texture variation")
+    elif contrast > 0.08:
+        score += 0.12
+        reasoning.append("Moderate texture variation")
+    
+    # Low homogeneity indicates irregular patterns (suspicious)
+    if homogeneity < 0.65:
+        score += 0.25
+        reasoning.append("Reduced uniformity detected")
+    elif homogeneity < 0.75:
+        score += 0.12
+        reasoning.append("Moderate uniformity")
+    
+    # Low energy indicates complex patterns (suspicious)
+    if energy < 0.40:
+        score += 0.25
+        reasoning.append("Complex texture patterns")
+    elif energy < 0.50:
+        score += 0.12
+        reasoning.append("Moderate texture complexity")
+    
+    # High standard deviation (variability) is suspicious
+    if std_val > 55:
+        score += 0.15
+        reasoning.append("Significant pixel variability")
+    elif std_val > 45:
+        score += 0.07
+        reasoning.append("Moderate pixel variability")
+    
+    # Additional check: mean intensity
+    if mean_val < 45 or mean_val > 185:
+        score += 0.10
+        reasoning.append("Unusual intensity distribution")
+    elif mean_val < 55 or mean_val > 175:
+        score += 0.05
+        reasoning.append("Slightly unusual intensity")
+    
+    # Normalize score to 0-1
+    score = min(score, 1.0)
+    
+    # Classification based on score with adjusted thresholds
+    if score >= 0.60:
+        classification = "SUSPICIOUS (Likely Metastasis)"
+        confidence = score
+    elif score >= 0.35:
+        classification = "BORDERLINE (Requires Review)"
+        confidence = 0.5
+    else:
+        classification = "NORMAL (Likely Healthy)"
+        confidence = 1.0 - score
+    
+    return {
+        "classification": classification,
+        "confidence": confidence,
+        "score": score,
+        "reasoning": " | ".join(reasoning) if reasoning else "Features within normal range"
     }
 
-    return fig, metrics
+
+def evaluate_classification_performance(predictions, ground_truth):
+    """
+    Calculate classification performance metrics.
+    
+    Args:
+        predictions: list of predicted labels (0 or 1)
+        ground_truth: list of actual labels (0 or 1)
+        
+    Returns:
+        dict: performance metrics (sensitivity, specificity, accuracy, precision, F1)
+    """
+    predictions = np.array(predictions)
+    ground_truth = np.array(ground_truth)
+    
+    # Confusion matrix
+    tn = np.sum((predictions == 0) & (ground_truth == 0))  # True Negatives
+    fp = np.sum((predictions == 1) & (ground_truth == 0))  # False Positives
+    fn = np.sum((predictions == 0) & (ground_truth == 1))  # False Negatives
+    tp = np.sum((predictions == 1) & (ground_truth == 1))  # True Positives
+    
+    # Metrics
+    sensitivity = tp / (tp + fn) if (tp + fn) > 0 else 0.0  # True Positive Rate
+    specificity = tn / (tn + fp) if (tn + fp) > 0 else 0.0  # True Negative Rate
+    accuracy = (tp + tn) / (tp + tn + fp + fn) if (tp + tn + fp + fn) > 0 else 0.0
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+    f1 = 2 * (precision * sensitivity) / (precision + sensitivity) if (precision + sensitivity) > 0 else 0.0
+    
+    return {
+        "sensitivity": float(sensitivity),
+        "specificity": float(specificity),
+        "accuracy": float(accuracy),
+        "precision": float(precision),
+        "f1_score": float(f1),
+        "true_positives": int(tp),
+        "true_negatives": int(tn),
+        "false_positives": int(fp),
+        "false_negatives": int(fn)
+    }
+
+
+def batch_classify_dataset(view_type="RANT", limit=0):
+    """
+    Classify all images in dataset and evaluate performance.
+    
+    Args:
+        view_type: "RANT" for anterior or "RPOST" for posterior
+        limit: 0 for all, or number to process
+        
+    Returns:
+        dict: results with predictions, ground truth, and metrics
+    """
+    image_dir = os.path.join(DATASET_PATH, f"chest{view_type}")
+    labels = load_dataset_labels(view_type)
+    
+    predictions = []
+    ground_truth = []
+    results_data = []
+    
+    count = 0
+    for filename in sorted(os.listdir(image_dir)):
+        if limit and count >= limit:
+            break
+            
+        if not filename.lower().endswith(('.jpg', '.jpeg', '.png')):
+            continue
+        
+        # Get ground truth
+        if filename not in labels:
+            continue
+        
+        true_label = labels[filename]
+        image_path = os.path.join(image_dir, filename)
+        
+        try:
+            # Process image
+            img_bgr = load_image_bgr(image_path)
+            processed_data = extract_metrics(img_bgr)
+            metrics = processed_data["metrics"]
+            
+            # Classify
+            classification = classify_bone_metastasis(metrics)
+            
+            # Determine prediction (0 or 1)
+            if "Suspicious" in classification["classification"]:
+                pred = 1
+            elif "Borderline" in classification["classification"]:
+                # For borderline, use score threshold (more balanced)
+                pred = 1 if classification["score"] >= 0.45 else 0
+            else:
+                pred = 0
+            
+            predictions.append(pred)
+            ground_truth.append(true_label)
+            
+            results_data.append({
+                "filename": filename,
+                "true_label": true_label,
+                "predicted": pred,
+                "classification": classification["classification"],
+                "confidence": classification["confidence"],
+                "contrast": metrics["contrast"],
+                "energy": metrics["energy"],
+                "homogeneity": metrics["homogeneity"]
+            })
+            
+            count += 1
+        except Exception as e:
+            continue
+    
+    # Calculate performance
+    performance = evaluate_classification_performance(predictions, ground_truth)
+    
+    return {
+        "predictions": predictions,
+        "ground_truth": ground_truth,
+        "results": results_data,
+        "performance": performance,
+        "total_images": count,
+        "view_type": view_type
+    }

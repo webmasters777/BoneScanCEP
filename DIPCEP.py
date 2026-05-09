@@ -4,7 +4,7 @@ import os
 
 import matplotlib.pyplot as plt
 
-from analysis import build_analysis, iter_image_files, load_image_bgr
+from analysis import build_analysis, iter_image_files, load_image_bgr, extract_metrics
 
 
 def save_metrics_csv(rows, csv_path):
@@ -52,9 +52,21 @@ def analyze_folder(folder_path, output_root, limit, save_fig):
     for image_path in iter_image_files(folder_path):
         if limit and count >= limit:
             break
-        fname, metrics, saved_path = analyze_single_image(
-            image_path, output_dir, save_fig=save_fig, show_fig=False
-        )
+        fname = os.path.basename(image_path)
+        img_bgr = load_image_bgr(image_path)
+        
+        # OPTIMIZATION: Only create visualization if figures need to be saved
+        if save_fig:
+            # Use full build_analysis (with visualization)
+            fig, metrics = build_analysis(img_bgr, fname)
+            saved_path = save_analysis_image(fig, output_dir, fname)
+            plt.close(fig)
+        else:
+            # Use optimized extract_metrics (skip visualization)
+            processed_data = extract_metrics(img_bgr)
+            metrics = processed_data["metrics"]
+            saved_path = ""
+        
         rows.append(
             {
                 "folder": folder_name,

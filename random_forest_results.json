@@ -1,0 +1,758 @@
+{
+  "timestamp": "2026-05-09T22:02:17.034694",
+  "training": {
+    "train_accuracy": 0.9965811965811966,
+    "test_accuracy": 0.935042735042735,
+    "cv_scores": [
+      0.6006927739824882,
+      0.5979505436351391,
+      0.5989010989010989,
+      0.5485347985347986,
+      0.5247252747252747
+    ],
+    "performance_test": {
+      "sensitivity": 0.15384615384615385,
+      "specificity": 0.9908424908424909,
+      "accuracy": 0.935042735042735,
+      "precision": 0.5454545454545454,
+      "f1_score": 0.24000000000000002,
+      "true_positives": 6,
+      "true_negatives": 541,
+      "false_positives": 5,
+      "false_negatives": 33
+    },
+    "feature_importance": {
+      "Contrast": 0.2132775815046714,
+      "Energy": 0.14563298628475305,
+      "Homogeneity": 0.1761553729297532,
+      "Mean": 0.16895777213710075,
+      "Std Dev": 0.15184191879138884,
+      "Median": 0.14413436835233281
+    },
+    "confusion_matrix": [
+      [
+        541,
+        5
+      ],
+      [
+        33,
+        6
+      ]
+    ]
+  },
+  "evaluation": {
+    "performance": {
+      "sensitivity": 0.8186528497409327,
+      "specificity": 0.9959736456808199,
+      "accuracy": 0.9842735042735042,
+      "precision": 0.9349112426035503,
+      "f1_score": 0.8729281767955801,
+      "true_positives": 158,
+      "true_negatives": 2721,
+      "false_positives": 11,
+      "false_negatives": 35
+    },
+    "sample_predictions": [
+      {
+        "filename": "1.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9831382757191726,
+        "confidence_metastasis": 0.016861724280827373
+      },
+      {
+        "filename": "10.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9550458330764249,
+        "confidence_metastasis": 0.0449541669235751
+      },
+      {
+        "filename": "100.jpg",
+        "true_label": 1,
+        "predicted": 1,
+        "confidence_normal": 0.32024829236287167,
+        "confidence_metastasis": 0.6797517076371286
+      },
+      {
+        "filename": "1000.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9754113752578446,
+        "confidence_metastasis": 0.024588624742155337
+      },
+      {
+        "filename": "1001.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9748312196431012,
+        "confidence_metastasis": 0.025168780356898825
+      },
+      {
+        "filename": "1002.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9733574573281101,
+        "confidence_metastasis": 0.026642542671889844
+      },
+      {
+        "filename": "1003.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9425156711541085,
+        "confidence_metastasis": 0.05748432884589163
+      },
+      {
+        "filename": "1004.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.990340256296951,
+        "confidence_metastasis": 0.00965974370304905
+      },
+      {
+        "filename": "1005.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9887519990276203,
+        "confidence_metastasis": 0.011248000972379617
+      },
+      {
+        "filename": "1006.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.951667727102027,
+        "confidence_metastasis": 0.048332272897973046
+      },
+      {
+        "filename": "1007.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9723170258209614,
+        "confidence_metastasis": 0.027682974179038783
+      },
+      {
+        "filename": "1008.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9817447129909366,
+        "confidence_metastasis": 0.018255287009063443
+      },
+      {
+        "filename": "1009.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8204825293309774,
+        "confidence_metastasis": 0.17951747066902268
+      },
+      {
+        "filename": "101.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8703722291236743,
+        "confidence_metastasis": 0.1296277708763258
+      },
+      {
+        "filename": "1011.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9857389165914303,
+        "confidence_metastasis": 0.014261083408569623
+      },
+      {
+        "filename": "1012.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9012727416968349,
+        "confidence_metastasis": 0.09872725830316482
+      },
+      {
+        "filename": "1013.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.7808271002765395,
+        "confidence_metastasis": 0.21917289972346057
+      },
+      {
+        "filename": "1014.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9538626177781379,
+        "confidence_metastasis": 0.04613738222186206
+      },
+      {
+        "filename": "1016.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9692259362558676,
+        "confidence_metastasis": 0.030774063744132416
+      },
+      {
+        "filename": "1017.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9154397937733072,
+        "confidence_metastasis": 0.08456020622669273
+      },
+      {
+        "filename": "1018.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9507326633346335,
+        "confidence_metastasis": 0.04926733666536646
+      },
+      {
+        "filename": "1019.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9737832095071345,
+        "confidence_metastasis": 0.026216790492865485
+      },
+      {
+        "filename": "102.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.973196805648147,
+        "confidence_metastasis": 0.026803194351853014
+      },
+      {
+        "filename": "1020.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.925160401407915,
+        "confidence_metastasis": 0.07483959859208494
+      },
+      {
+        "filename": "1021.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9889280525252961,
+        "confidence_metastasis": 0.011071947474703872
+      },
+      {
+        "filename": "1022.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 1.0,
+        "confidence_metastasis": 0.0
+      },
+      {
+        "filename": "1023.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.926757151207058,
+        "confidence_metastasis": 0.0732428487929418
+      },
+      {
+        "filename": "1024.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9368191090190006,
+        "confidence_metastasis": 0.06318089098099942
+      },
+      {
+        "filename": "1025.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9724609158686112,
+        "confidence_metastasis": 0.027539084131388836
+      },
+      {
+        "filename": "1026.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9439314036776747,
+        "confidence_metastasis": 0.0560685963223252
+      },
+      {
+        "filename": "1027.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.7816861384863443,
+        "confidence_metastasis": 0.21831386151365575
+      },
+      {
+        "filename": "1029.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9066321389516535,
+        "confidence_metastasis": 0.09336786104834627
+      },
+      {
+        "filename": "103.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9475121912355394,
+        "confidence_metastasis": 0.05248780876446069
+      },
+      {
+        "filename": "1030.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8435752785158411,
+        "confidence_metastasis": 0.1564247214841588
+      },
+      {
+        "filename": "1031.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8738765806304096,
+        "confidence_metastasis": 0.12612341936959034
+      },
+      {
+        "filename": "1032.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.803284521782307,
+        "confidence_metastasis": 0.19671547821769272
+      },
+      {
+        "filename": "1033.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9904485872414797,
+        "confidence_metastasis": 0.009551412758520245
+      },
+      {
+        "filename": "1034.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9213829969295348,
+        "confidence_metastasis": 0.07861700307046512
+      },
+      {
+        "filename": "1035.jpg",
+        "true_label": 1,
+        "predicted": 0,
+        "confidence_normal": 0.940528522577149,
+        "confidence_metastasis": 0.05947147742285089
+      },
+      {
+        "filename": "1036.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9581773063649044,
+        "confidence_metastasis": 0.04182269363509565
+      },
+      {
+        "filename": "1037.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8684021814687596,
+        "confidence_metastasis": 0.13159781853124033
+      },
+      {
+        "filename": "1039.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9427342235295743,
+        "confidence_metastasis": 0.057265776470425606
+      },
+      {
+        "filename": "104.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.937098030717003,
+        "confidence_metastasis": 0.0629019692829968
+      },
+      {
+        "filename": "1040.jpg",
+        "true_label": 1,
+        "predicted": 1,
+        "confidence_normal": 0.4206825019536618,
+        "confidence_metastasis": 0.579317498046338
+      },
+      {
+        "filename": "1041.jpg",
+        "true_label": 1,
+        "predicted": 1,
+        "confidence_normal": 0.08802791207869584,
+        "confidence_metastasis": 0.9119720879213041
+      },
+      {
+        "filename": "1042.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.7718994095466277,
+        "confidence_metastasis": 0.22810059045337241
+      },
+      {
+        "filename": "1044.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9535826592626339,
+        "confidence_metastasis": 0.04641734073736609
+      },
+      {
+        "filename": "1045.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8970337886556246,
+        "confidence_metastasis": 0.10296621134437522
+      },
+      {
+        "filename": "1046.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9739114990113074,
+        "confidence_metastasis": 0.026088500988692566
+      },
+      {
+        "filename": "1047.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9468677474947285,
+        "confidence_metastasis": 0.053132252505271475
+      },
+      {
+        "filename": "1048.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9754367409874171,
+        "confidence_metastasis": 0.024563259012582894
+      },
+      {
+        "filename": "1049.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8908243414122562,
+        "confidence_metastasis": 0.10917565858774378
+      },
+      {
+        "filename": "105.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9628815471748108,
+        "confidence_metastasis": 0.03711845282518926
+      },
+      {
+        "filename": "1050.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9417355570012488,
+        "confidence_metastasis": 0.05826444299875121
+      },
+      {
+        "filename": "1051.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8915773951294769,
+        "confidence_metastasis": 0.10842260487052321
+      },
+      {
+        "filename": "1052.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9449834911272487,
+        "confidence_metastasis": 0.05501650887275114
+      },
+      {
+        "filename": "1053.jpg",
+        "true_label": 1,
+        "predicted": 0,
+        "confidence_normal": 0.7697666428402143,
+        "confidence_metastasis": 0.2302333571597856
+      },
+      {
+        "filename": "1055.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.915807254929952,
+        "confidence_metastasis": 0.08419274507004798
+      },
+      {
+        "filename": "1056.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 1.0,
+        "confidence_metastasis": 0.0
+      },
+      {
+        "filename": "1057.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.924558535738463,
+        "confidence_metastasis": 0.07544146426153706
+      },
+      {
+        "filename": "1059.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9813162393162393,
+        "confidence_metastasis": 0.018683760683760684
+      },
+      {
+        "filename": "106.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9842075187080208,
+        "confidence_metastasis": 0.01579248129197929
+      },
+      {
+        "filename": "1060.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9729954883623835,
+        "confidence_metastasis": 0.027004511637616677
+      },
+      {
+        "filename": "1062.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8980243309340099,
+        "confidence_metastasis": 0.10197566906599018
+      },
+      {
+        "filename": "1063.jpg",
+        "true_label": 1,
+        "predicted": 1,
+        "confidence_normal": 0.11005104237820318,
+        "confidence_metastasis": 0.8899489576217968
+      },
+      {
+        "filename": "1064.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9491808614160213,
+        "confidence_metastasis": 0.050819138583978615
+      },
+      {
+        "filename": "1065.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9606194179045302,
+        "confidence_metastasis": 0.03938058209546967
+      },
+      {
+        "filename": "1066.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9763017676352992,
+        "confidence_metastasis": 0.02369823236470092
+      },
+      {
+        "filename": "1067.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9722389389215145,
+        "confidence_metastasis": 0.027761061078485434
+      },
+      {
+        "filename": "1068.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9987348072693598,
+        "confidence_metastasis": 0.0012651927306401203
+      },
+      {
+        "filename": "107.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8359933069084013,
+        "confidence_metastasis": 0.1640066930915986
+      },
+      {
+        "filename": "1071.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8895523638686395,
+        "confidence_metastasis": 0.11044763613136042
+      },
+      {
+        "filename": "1072.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9645538035434934,
+        "confidence_metastasis": 0.035446196456506616
+      },
+      {
+        "filename": "1073.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9906581196581196,
+        "confidence_metastasis": 0.009341880341880342
+      },
+      {
+        "filename": "1074.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9943120384101165,
+        "confidence_metastasis": 0.005687961589883454
+      },
+      {
+        "filename": "1075.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9587018687977752,
+        "confidence_metastasis": 0.04129813120222463
+      },
+      {
+        "filename": "1076.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9005611938915199,
+        "confidence_metastasis": 0.09943880610848015
+      },
+      {
+        "filename": "1077.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.7119851599361879,
+        "confidence_metastasis": 0.288014840063812
+      },
+      {
+        "filename": "1078.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9888369823425278,
+        "confidence_metastasis": 0.011163017657472274
+      },
+      {
+        "filename": "108.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9015142513120318,
+        "confidence_metastasis": 0.09848574868796824
+      },
+      {
+        "filename": "1080.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9163127630367148,
+        "confidence_metastasis": 0.08368723696328521
+      },
+      {
+        "filename": "1081.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.933850704845622,
+        "confidence_metastasis": 0.06614929515437801
+      },
+      {
+        "filename": "1083.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9814241620346897,
+        "confidence_metastasis": 0.018575837965310208
+      },
+      {
+        "filename": "1084.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.944982625573309,
+        "confidence_metastasis": 0.05501737442669092
+      },
+      {
+        "filename": "1085.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9213179045519903,
+        "confidence_metastasis": 0.0786820954480096
+      },
+      {
+        "filename": "1086.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8433763925892673,
+        "confidence_metastasis": 0.15662360741073264
+      },
+      {
+        "filename": "1087.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8369498593609783,
+        "confidence_metastasis": 0.16305014063902157
+      },
+      {
+        "filename": "1088.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9851337324961282,
+        "confidence_metastasis": 0.01486626750387175
+      },
+      {
+        "filename": "1089.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9906581196581196,
+        "confidence_metastasis": 0.009341880341880342
+      },
+      {
+        "filename": "109.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9469580357067328,
+        "confidence_metastasis": 0.05304196429326737
+      },
+      {
+        "filename": "1090.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 1.0,
+        "confidence_metastasis": 0.0
+      },
+      {
+        "filename": "1091.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9839431426840128,
+        "confidence_metastasis": 0.016056857315987067
+      },
+      {
+        "filename": "1092.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9834894259818731,
+        "confidence_metastasis": 0.016510574018126885
+      },
+      {
+        "filename": "1093.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8993517138370873,
+        "confidence_metastasis": 0.10064828616291262
+      },
+      {
+        "filename": "1094.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 1.0,
+        "confidence_metastasis": 0.0
+      },
+      {
+        "filename": "1095.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9830589260128809,
+        "confidence_metastasis": 0.01694107398711902
+      },
+      {
+        "filename": "1097.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.949418313890956,
+        "confidence_metastasis": 0.050581686109044004
+      },
+      {
+        "filename": "1098.jpg",
+        "true_label": 1,
+        "predicted": 1,
+        "confidence_normal": 0.26601834372618116,
+        "confidence_metastasis": 0.7339816562738188
+      },
+      {
+        "filename": "1099.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.8284113371807434,
+        "confidence_metastasis": 0.1715886628192565
+      },
+      {
+        "filename": "11.jpg",
+        "true_label": 0,
+        "predicted": 0,
+        "confidence_normal": 0.9917447129909366,
+        "confidence_metastasis": 0.008255287009063443
+      }
+    ]
+  }
+}
