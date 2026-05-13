@@ -3,3 +3,11 @@ opencv-python-headless
 numpy
 matplotlib
 scikit-image
+scikit-learn
+joblib
+torch
+torchvision
+pillow
+seaborn
+plotly
+pandas

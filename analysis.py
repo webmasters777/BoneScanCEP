@@ -5,11 +5,40 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.gridspec import GridSpec
 from skimage.feature import graycomatrix, graycoprops, local_binary_pattern
+import torch
+import torch.nn as nn
+from torchvision import models, transforms
+from PIL import Image
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 
 # Dataset path
 DATASET_PATH = os.path.join(os.path.dirname(__file__), "dataset project")
+
+# Load ResNet50 model
+def load_resnet50_model():
+    model_path = os.path.join(os.path.dirname(__file__), "bone_scan_resnet50_final.pth")
+    if os.path.exists(model_path):
+        model = models.resnet50()
+        num_features = model.fc.in_features
+        model.fc = nn.Sequential(
+            nn.Linear(num_features, 512),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(512, 256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(256, 1),
+            nn.Sigmoid()
+        )
+        model.load_state_dict(torch.load(model_path))
+        model.eval()
+        return model
+    else:
+        print("ResNet50 model not found. Please train it first using train_resnet50.py")
+        return None
+
+resnet_model = load_resnet50_model()
 
 
 def iter_image_files(folder_path):
@@ -251,7 +280,7 @@ def create_visualization(processed_data, fname="image"):
 
 def build_analysis(img_bgr, fname="image"):
     """
-    WRAPPER: Combines metrics extraction and visualization.
+    WRAPPER: Combines metrics extraction, visualization, and AI classification.
     For backward compatibility with existing code (UI.py, DIPCEP.py).
     
     Args:
@@ -259,12 +288,13 @@ def build_analysis(img_bgr, fname="image"):
         fname: filename for title
         
     Returns:
-        tuple: (matplotlib.figure.Figure, dict of metrics)
+        tuple: (matplotlib.figure.Figure, dict of metrics, dict of AI classification)
     """
     processed_data = extract_metrics(img_bgr)
     fig = create_visualization(processed_data, fname)
     metrics = processed_data["metrics"]
-    return fig, metrics
+    ai_classification = classify_with_resnet50(img_bgr)
+    return fig, metrics, ai_classification
 
 
 # ============================================================================
@@ -297,91 +327,52 @@ def load_dataset_labels(view_type="RANT"):
     return labels
 
 
-def classify_bone_metastasis(metrics):
+def preprocess_for_resnet(img_bgr):
     """
-    Classify if image shows bone metastasis based on extracted features.
-    Uses machine learning-like approach with feature thresholds.
-    
-    Args:
-        metrics: dict with GLCM, LBP, and statistical features
-        
-    Returns:
-        dict: {
-            'classification': 'SUSPICIOUS'|'BORDERLINE'|'NORMAL',
-            'confidence': float (0-1),
-            'score': float (0-1),
-            'reasoning': str
-        }
+    Preprocess image for ResNet50: convert to RGB, resize to 224x224, normalize.
+    Use same preprocessing as training (no DIP filters to avoid domain shift).
     """
-    contrast = metrics['contrast']
-    energy = metrics['energy']
-    homogeneity = metrics['homogeneity']
-    mean_val = metrics['mean']
-    std_val = metrics['std']
+    # Convert BGR to RGB
+    img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
     
-    # Feature-based scoring (0-1) - Improved for better detection
-    score = 0.0
-    reasoning = []
+    # Convert to PIL Image
+    img_pil = Image.fromarray(img_rgb)
     
-    # High contrast indicates texture variation (suspicious)
-    if contrast > 0.12:
-        score += 0.25
-        reasoning.append("Elevated texture variation")
-    elif contrast > 0.08:
-        score += 0.12
-        reasoning.append("Moderate texture variation")
+    # Apply same transforms as training
+    transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
     
-    # Low homogeneity indicates irregular patterns (suspicious)
-    if homogeneity < 0.65:
-        score += 0.25
-        reasoning.append("Reduced uniformity detected")
-    elif homogeneity < 0.75:
-        score += 0.12
-        reasoning.append("Moderate uniformity")
+    return transform(img_pil).unsqueeze(0)
+
+
+def classify_with_resnet50(img_bgr):
+    """
+    Classify image using ResNet50 model.
+    Returns: {'prediction': 0 or 1, 'confidence': float, 'class': str}
+    """
+    if resnet_model is None:
+        return {"prediction": -1, "confidence": 0.0, "class": "Model not loaded"}
     
-    # Low energy indicates complex patterns (suspicious)
-    if energy < 0.40:
-        score += 0.25
-        reasoning.append("Complex texture patterns")
-    elif energy < 0.50:
-        score += 0.12
-        reasoning.append("Moderate texture complexity")
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    resnet_model.to(device)
     
-    # High standard deviation (variability) is suspicious
-    if std_val > 55:
-        score += 0.15
-        reasoning.append("Significant pixel variability")
-    elif std_val > 45:
-        score += 0.07
-        reasoning.append("Moderate pixel variability")
+    processed = preprocess_for_resnet(img_bgr).to(device)
+    with torch.no_grad():
+        output = resnet_model(processed).squeeze()
+        probability = output.item()
     
-    # Additional check: mean intensity
-    if mean_val < 45 or mean_val > 185:
-        score += 0.10
-        reasoning.append("Unusual intensity distribution")
-    elif mean_val < 55 or mean_val > 175:
-        score += 0.05
-        reasoning.append("Slightly unusual intensity")
-    
-    # Normalize score to 0-1
-    score = min(score, 1.0)
-    
-    # Classification based on score with adjusted thresholds
-    if score >= 0.60:
-        classification = "SUSPICIOUS (Likely Metastasis)"
-        confidence = score
-    elif score >= 0.35:
-        classification = "BORDERLINE (Requires Review)"
-        confidence = 0.5
-    else:
-        classification = "NORMAL (Likely Healthy)"
-        confidence = 1.0 - score
+    prediction = 1 if probability > 0.5 else 0
+    confidence = probability if prediction == 1 else 1 - probability
+    class_name = "Metastasis Detected" if prediction == 1 else "Healthy Bone"
     
     return {
-        "classification": classification,
-        "confidence": confidence,
-        "score": score,
-        "reasoning": " | ".join(reasoning) if reasoning else "Features within normal range"
+        "prediction": prediction,
+        "confidence": float(confidence),
+        "class": class_name,
+        "probability": float(probability)
     }
 
 
@@ -461,20 +452,12 @@ def batch_classify_dataset(view_type="RANT", limit=0):
         try:
             # Process image
             img_bgr = load_image_bgr(image_path)
-            processed_data = extract_metrics(img_bgr)
-            metrics = processed_data["metrics"]
             
-            # Classify
-            classification = classify_bone_metastasis(metrics)
+            # Classify with ResNet50
+            classification = classify_with_resnet50(img_bgr)
             
-            # Determine prediction (0 or 1)
-            if "Suspicious" in classification["classification"]:
-                pred = 1
-            elif "Borderline" in classification["classification"]:
-                # For borderline, use score threshold (more balanced)
-                pred = 1 if classification["score"] >= 0.45 else 0
-            else:
-                pred = 0
+            pred = classification["prediction"]
+            confidence = classification["confidence"]
             
             predictions.append(pred)
             ground_truth.append(true_label)
@@ -483,11 +466,9 @@ def batch_classify_dataset(view_type="RANT", limit=0):
                 "filename": filename,
                 "true_label": true_label,
                 "predicted": pred,
-                "classification": classification["classification"],
-                "confidence": classification["confidence"],
-                "contrast": metrics["contrast"],
-                "energy": metrics["energy"],
-                "homogeneity": metrics["homogeneity"]
+                "classification": classification["class"],
+                "confidence": confidence,
+                "probability": classification["probability"]
             })
             
             count += 1

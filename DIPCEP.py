@@ -28,7 +28,7 @@ def save_analysis_image(fig, output_dir, fname):
 def analyze_single_image(image_path, output_dir, save_fig, show_fig):
     fname = os.path.basename(image_path)
     img_bgr = load_image_bgr(image_path)
-    fig, metrics = build_analysis(img_bgr, fname)
+    fig, metrics, ai_result = build_analysis(img_bgr, fname)
 
     saved_path = ""
     if save_fig:
@@ -39,7 +39,7 @@ def analyze_single_image(image_path, output_dir, save_fig, show_fig):
 
     plt.close(fig)
 
-    return fname, metrics, saved_path
+    return fname, metrics, ai_result, saved_path
 
 
 def analyze_folder(folder_path, output_root, limit, save_fig):
@@ -58,13 +58,14 @@ def analyze_folder(folder_path, output_root, limit, save_fig):
         # OPTIMIZATION: Only create visualization if figures need to be saved
         if save_fig:
             # Use full build_analysis (with visualization)
-            fig, metrics = build_analysis(img_bgr, fname)
+            fig, metrics, ai_result = build_analysis(img_bgr, fname)
             saved_path = save_analysis_image(fig, output_dir, fname)
             plt.close(fig)
         else:
             # Use optimized extract_metrics (skip visualization)
             processed_data = extract_metrics(img_bgr)
             metrics = processed_data["metrics"]
+            ai_result = classify_with_resnet50(img_bgr)
             saved_path = ""
         
         rows.append(
@@ -80,6 +81,9 @@ def analyze_folder(folder_path, output_root, limit, save_fig):
                 "std": f"{metrics['std']:.2f}",
                 "median": f"{metrics['median']:.2f}",
                 "otsu": f"{metrics['otsu']:.0f}",
+                "ai_prediction": ai_result['prediction'],
+                "ai_class": ai_result['class'],
+                "ai_confidence": f"{ai_result['confidence']:.1%}",
             }
         )
         count += 1
@@ -136,7 +140,7 @@ def main():
         if not os.path.exists(args.image_path):
             raise FileNotFoundError(f"Image not found: {args.image_path}")
 
-        fname, metrics, saved_path = analyze_single_image(
+        fname, metrics, ai_result, saved_path = analyze_single_image(
             args.image_path,
             output_root,
             save_fig=not args.no_fig,
@@ -154,6 +158,8 @@ def main():
         print(f"  Std         : {metrics['std']:.2f}")
         print(f"  Median      : {metrics['median']:.2f}")
         print(f"  Otsu thr    : {metrics['otsu']:.0f}")
+        print(f"\n  AI Classification: {ai_result['class']}")
+        print(f"  Confidence: {ai_result['confidence']:.1%}")
         return
 
     all_rows = []

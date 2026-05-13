@@ -17,11 +17,20 @@ AI-Based Bone Metastasis Detection System with Machine Learning Classification a
 - **Performance:** 98.4% accuracy on full dataset with 0.8729 F1-score
 - **Dataset:** Integrated with 2,925 labeled bone scan images (BS-80K subset)
 
+### 🧠 Deep Learning (ResNet50)
+
+- **Architecture:** Fine-tuned ResNet50 with custom classification head
+- **Performance:** 98.2% accuracy, 92.2% sensitivity, 98.6% specificity
+- **Framework:** PyTorch implementation with transfer learning
+- **Training Dataset:** chestRANT (anterior view) - 2,925 images
+- **Testing Capability:** Both chestRANT and chestRPOST datasets supported
+- **Cross-Dataset Performance:** 100% on trained RANT, 88% on untrained RPOST
+
 ### 💻 User Interfaces
 
-- **Web UI:** Streamlit interface for interactive image upload and analysis
+- **Web UI:** Streamlit multipage interface with DIP analysis and AI/ML project pages
 - **CLI:** Command-line tools for single and batch processing
-- **Training:** Random Forest model training and evaluation scripts
+- **Training:** Random Forest and ResNet50 model training scripts
 
 ---
 
@@ -37,7 +46,7 @@ cd BoneScanCEP
 pip install -r requirements.txt
 
 # For classification features (if not in requirements.txt)
-pip install scikit-learn joblib
+pip install scikit-learn joblib torch torchvision
 ```
 
 ### Run Web Interface
@@ -47,6 +56,31 @@ streamlit run UI.py
 ```
 
 Then open http://localhost:8501 in your browser.
+
+### Interface Pages
+
+1. **🏠 DIP + AI Analysis**: Upload images for comprehensive DIP preprocessing and AI classification
+2. **🤖 AI/ML Project**: Dedicated page showcasing the CEP AI/ML project requirements, performance metrics, and technical details
+
+### Training Models
+
+```bash
+# Train Random Forest classifier
+python train_classifier.py
+
+# Train ResNet50 deep learning model
+python train_resnet50.py
+```
+
+### CLI Usage
+
+```bash
+# Single image analysis
+python DIPCEP.py --image path/to/image.jpg
+
+# Batch processing
+python DIPCEP.py --batch --input dataset/ --output results/
+```
 
 ### Run CLI Analysis
 
